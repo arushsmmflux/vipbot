@@ -32,9 +32,9 @@ PLANS = [
         "name": "Plan 1 Demo",
         "buy_url": "https://yourpaymentgateway.com/pay/plan1",
         "videos": [
-            "https://videotourl.com/videos/placeholder_1_1.mp4",
-            "https://videotourl.com/videos/placeholder_1_2.mp4",
-            "https://videotourl.com/videos/placeholder_1_3.mp4",
+            "https://videotourl.com/videos/1791609530271-d1845e11-78bd-4465-a0e3-3e0dd57fb424.mp4"",
+            "https://videotourl.com/videos/1791610410648-c50ab2d2-b1b2-4998-8f5f-43a5f719b603.mp4",
+            "https://videotourl.com/videos/1791609652325-1646ca32-e73f-4a5a-9874-a0f4e401c6bb.mp4",
             "https://videotourl.com/videos/placeholder_1_4.mp4",
             "https://videotourl.com/videos/placeholder_1_5.mp4",
         ],
