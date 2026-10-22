@@ -377,20 +377,20 @@ def show_demo(call):
 
             message_ids.append(instruction.message_id)
 
+except Exception as e:
+    log.exception("Video media group failed: %s", e)
+
+    for message_id in reversed(message_ids):
+        try:
+            bot.delete_message(chat_id, message_id)
         except Exception:
-            log.exception("Video media group failed")
+            pass
 
-            for message_id in reversed(message_ids):
-                try:
-                    bot.delete_message(chat_id, message_id)
-                except Exception:
-                    pass
-
-            bot.send_message(
-                chat_id,
-                "Videos send nahi hui. Direct video URLs check karo."
-            )
-            return
+    bot.send_message(
+        chat_id,
+        f"Video error: {str(e)[:800]}"
+    )
+    return
 
     active_demos[user_id] = {
         "chat_id": chat_id,
