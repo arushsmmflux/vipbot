@@ -327,5 +327,6 @@ def handle_change_plan(call):
 # MAIN ENTRY POINT
 # ==========================================
 if __name__ == "__main__":
-  logger.info("Bot is starting up...")
-  bot.infinity_polling(skip_pending=True)
+    logger.info("Bot is starting up...")
+    bot.remove_webhook()  # Telegram ke purane webhook ko remove karne ke liye
+    bot.infinity_polling(skip_pending=True)
