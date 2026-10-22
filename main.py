@@ -11,9 +11,9 @@ from telebot.types import (
 # 1. BOT CONFIGURATION
 # ==================================================
 # Yahan apna Telegram Bot Token directly paste karein:
-BOT_TOKEN = "PASTE_YOUR_BOT_TOKEN_HERE"
+BOT_TOKEN = "8916953762:AAEg493ZtcCDx8Ux0ZXWcUVaQMnI6hgsbk4"
 
-if not BOT_TOKEN or BOT_TOKEN == "8916953762:AAEg493ZtcCDx8Ux0ZXWcUVaQMnI6hgsbk4":
+if not BOT_TOKEN or BOT_TOKEN == "PASTE_YOUR_BOT_TOKEN_HERE":
     raise RuntimeError("Kripya sahi Telegram Bot Token paste karein!")
 
 logging.basicConfig(level=logging.INFO)
