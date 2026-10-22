@@ -5,7 +5,7 @@ from telebot import TeleBot, types
 # 1. BOT CONFIGURATION
 # ==========================================
 # Paste your Telegram Bot Token directly below:
-BOT_TOKEN = "8916953762:AAHIY62LgS0lxFF1ubdwCAQuqMrlkriF2po"
+BOT_TOKEN = "8916953762:AAEg493ZtcCDx8Ux0ZXWcUVaQMnI6hgsbk4"
 
 bot = TeleBot(BOT_TOKEN, parse_mode="HTML")
 
