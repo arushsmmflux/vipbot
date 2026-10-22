@@ -1,490 +1,331 @@
-
 import logging
-import telebot
+from telebot import TeleBot, types
 
-from telebot.types import (
-    InlineKeyboardMarkup,
-    InlineKeyboardButton,
-    InputMediaVideo,
+# ==========================================
+# 1. BOT CONFIGURATION
+# ==========================================
+# Paste your Telegram Bot Token directly below:
+BOT_TOKEN = "8916953762:AAHIY62LgS0lxFF1ubdwCAQuqMrlkriF2po"
+
+bot = TeleBot(BOT_TOKEN, parse_mode="HTML")
+
+# Configure logging for debugging and error tracking
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
 )
+logger = logging.getLogger(__name__)
 
-# ==================================================
-# BOT TOKEN — YAHAN APNA TOKEN DALO
-# ==================================================
+# ==========================================
+# 5 & 6. CONTENT & PURCHASE URL CONFIGURATION
+# ==========================================
+# Leave or replace these placeholders with your actual direct public video URLs.
+# Each plan from Plan 1 to Plan 9 has its own list of video URLs.
+PLAN_VIDEOS = {
+    "𝙈𝙊𝙈 𝘼𝙉𝘿 𝙎𝙊𝙉 😍🔥": [
+        "https://videotourl.com/videos/1791609652325-1646ca32-e73f-4a5a-9874-a0f4e401c6bb.mp4",
+        "https://videotourl.com/videos/1791610410648-c50ab2d2-b1b2-4998-8f5f-43a5f719b603.mp4",
+        "https://videotourl.com/videos/1791609530271-d1845e11-78bd-4465-a0e3-3e0dd57fb424.mp4",
+        "https://videotourl.com/videos/placeholder_1_4.mp4",
+        "https://videotourl.com/videos/placeholder_1_5.mp4",
+    ],
+    "plan_2": [
+        "https://videotourl.com/videos/placeholder_2_1.mp4",
+        "https://videotourl.com/videos/placeholder_2_2.mp4",
+        "https://videotourl.com/videos/placeholder_2_3.mp4",
+        "https://videotourl.com/videos/placeholder_2_4.mp4",
+        "https://videotourl.com/videos/placeholder_2_5.mp4",
+    ],
+    "plan_3": [
+        "https://videotourl.com/videos/placeholder_3_1.mp4",
+        "https://videotourl.com/videos/placeholder_3_2.mp4",
+        "https://videotourl.com/videos/placeholder_3_3.mp4",
+        "https://videotourl.com/videos/placeholder_3_4.mp4",
+        "https://videotourl.com/videos/placeholder_3_5.mp4",
+    ],
+    "plan_4": [
+        "https://videotourl.com/videos/placeholder_4_1.mp4",
+        "https://videotourl.com/videos/placeholder_4_2.mp4",
+        "https://videotourl.com/videos/placeholder_4_3.mp4",
+        "https://videotourl.com/videos/placeholder_4_4.mp4",
+        "https://videotourl.com/videos/placeholder_4_5.mp4",
+    ],
+    "plan_5": [
+        "https://videotourl.com/videos/placeholder_5_1.mp4",
+        "https://videotourl.com/videos/placeholder_5_2.mp4",
+        "https://videotourl.com/videos/placeholder_5_3.mp4",
+        "https://videotourl.com/videos/placeholder_5_4.mp4",
+        "https://videotourl.com/videos/placeholder_5_5.mp4",
+    ],
+    "plan_6": [
+        "https://videotourl.com/videos/placeholder_6_1.mp4",
+        "https://videotourl.com/videos/placeholder_6_2.mp4",
+        "https://videotourl.com/videos/placeholder_6_3.mp4",
+        "https://videotourl.com/videos/placeholder_6_4.mp4",
+        "https://videotourl.com/videos/placeholder_6_5.mp4",
+    ],
+    "plan_7": [
+        "https://videotourl.com/videos/placeholder_7_1.mp4",
+        "https://videotourl.com/videos/placeholder_7_2.mp4",
+        "https://videotourl.com/videos/placeholder_7_3.mp4",
+        "https://videotourl.com/videos/placeholder_7_4.mp4",
+        "https://videotourl.com/videos/placeholder_7_5.mp4",
+    ],
+    "plan_8": [
+        "https://videotourl.com/videos/placeholder_8_1.mp4",
+        "https://videotourl.com/videos/placeholder_8_2.mp4",
+        "https://videotourl.com/videos/placeholder_8_3.mp4",
+        "https://videotourl.com/videos/placeholder_8_4.mp4",
+        "https://videotourl.com/videos/placeholder_8_5.mp4",
+    ],
+    "plan_9": [
+        "https://videotourl.com/videos/placeholder_9_1.mp4",
+        "https://videotourl.com/videos/placeholder_9_2.mp4",
+        "https://videotourl.com/videos/placeholder_9_3.mp4",
+        "https://videotourl.com/videos/placeholder_9_4.mp4",
+        "https://videotourl.com/videos/placeholder_9_5.mp4",
+    ],
+}
 
-TOKEN = "8916953762:AAHIY62LgS0lxFF1ubdwCAQuqMrlkriF2po"
+# 4. Plan 10 Image URL Placeholder
+PLAN_10_IMAGE = "https://videotourl.com/images/placeholder_plan_10.jpg"
 
-if TOKEN == "PASTE_YOUR_BOT_TOKEN_HERE" or not TOKEN.strip():
-    raise RuntimeError("main.py mein apna bot token daalo.")
+# 6. Configurable Purchase URLs for each plan
+PLAN_PURCHASE_URLS = {
+    "plan_1": "https://yourpaymentgateway.com/pay/plan1",
+    "plan_2": "https://yourpaymentgateway.com/pay/plan2",
+    "plan_3": "https://yourpaymentgateway.com/pay/plan3",
+    "plan_4": "https://yourpaymentgateway.com/pay/plan4",
+    "plan_5": "https://yourpaymentgateway.com/pay/plan5",
+    "plan_6": "https://yourpaymentgateway.com/pay/plan6",
+    "plan_7": "https://yourpaymentgateway.com/pay/plan7",
+    "plan_8": "https://yourpaymentgateway.com/pay/plan8",
+    "plan_9": "https://yourpaymentgateway.com/pay/plan9",
+    "plan_10": "https://yourpaymentgateway.com/pay/plan10",
+}
 
-bot = telebot.TeleBot(TOKEN.strip())
-
-logging.basicConfig(level=logging.INFO)
-log = logging.getLogger("demo_bot")
-
-
-# ==================================================
-# PLANS
-# Plan 1-9: Hosted video URLs
-# Plan 10: Hosted image URL only
-# ==================================================
-
-PLANS = [
-    {
-        "id": 1,
-        "name": "𝙈𝙊𝙈 𝘼𝙉𝘿 𝙎𝙊𝙉 😍🔥",
-        "buy_url": "https://example.com/buy1",
-        "videos": [
-            "https://videotourl.com/videos/1791609652325-1646ca32-e73f-4a5a-9874-a0f4e401c6bb.mp4",
-            "https://videotourl.com/videos/1791610410648-c50ab2d2-b1b2-4998-8f5f-43a5f719b603.mp4",
-            "https://videotourl.com/videos/1791609530271-d1845e11-78bd-4465-a0e3-3e0dd57fb424.mp4",
-            "https://videotourl.com/videos/1791609530271-d1845e11-78bd-4465-a0e3-3e0dd57fb424.mp4",
-            "https://your-host.com/plan1-video5.mp4",
-        ],
-    },
-    {
-        "id": 2,
-        "name": "Plan 2 Demo",
-        "buy_url": "https://example.com/buy2",
-        "videos": [
-            "https://your-host.com/plan2-video1.mp4",
-            "https://your-host.com/plan2-video2.mp4",
-            "https://your-host.com/plan2-video3.mp4",
-            "https://your-host.com/plan2-video4.mp4",
-            "https://your-host.com/plan2-video5.mp4",
-        ],
-    },
-    {
-        "id": 3,
-        "name": "Plan 3 Demo",
-        "buy_url": "https://example.com/buy3",
-        "videos": [
-            "https://your-host.com/plan3-video1.mp4",
-            "https://your-host.com/plan3-video2.mp4",
-            "https://your-host.com/plan3-video3.mp4",
-            "https://your-host.com/plan3-video4.mp4",
-            "https://your-host.com/plan3-video5.mp4",
-        ],
-    },
-    {
-        "id": 4,
-        "name": "Plan 4 Demo",
-        "buy_url": "https://example.com/buy4",
-        "videos": [
-            "https://your-host.com/plan4-video1.mp4",
-            "https://your-host.com/plan4-video2.mp4",
-            "https://your-host.com/plan4-video3.mp4",
-            "https://your-host.com/plan4-video4.mp4",
-            "https://your-host.com/plan4-video5.mp4",
-        ],
-    },
-    {
-        "id": 5,
-        "name": "Plan 5 Demo",
-        "buy_url": "https://example.com/buy5",
-        "videos": [
-            "https://your-host.com/plan5-video1.mp4",
-            "https://your-host.com/plan5-video2.mp4",
-            "https://your-host.com/plan5-video3.mp4",
-            "https://your-host.com/plan5-video4.mp4",
-            "https://your-host.com/plan5-video5.mp4",
-        ],
-    },
-    {
-        "id": 6,
-        "name": "Plan 6 Demo",
-        "buy_url": "https://example.com/buy6",
-        "videos": [
-            "https://your-host.com/plan6-video1.mp4",
-            "https://your-host.com/plan6-video2.mp4",
-            "https://your-host.com/plan6-video3.mp4",
-            "https://your-host.com/plan6-video4.mp4",
-            "https://your-host.com/plan6-video5.mp4",
-        ],
-    },
-    {
-        "id": 7,
-        "name": "Plan 7 Demo",
-        "buy_url": "https://example.com/buy7",
-        "videos": [
-            "https://your-host.com/plan7-video1.mp4",
-            "https://your-host.com/plan7-video2.mp4",
-            "https://your-host.com/plan7-video3.mp4",
-            "https://your-host.com/plan7-video4.mp4",
-            "https://your-host.com/plan7-video5.mp4",
-        ],
-    },
-    {
-        "id": 8,
-        "name": "Plan 8 Demo",
-        "buy_url": "https://example.com/buy8",
-        "videos": [
-            "https://your-host.com/plan8-video1.mp4",
-            "https://your-host.com/plan8-video2.mp4",
-            "https://your-host.com/plan8-video3.mp4",
-            "https://your-host.com/plan8-video4.mp4",
-            "https://your-host.com/plan8-video5.mp4",
-        ],
-    },
-    {
-        "id": 9,
-        "name": "Plan 9 Demo",
-        "buy_url": "https://example.com/buy9",
-        "videos": [
-            "https://your-host.com/plan9-video1.mp4",
-            "https://your-host.com/plan9-video2.mp4",
-            "https://your-host.com/plan9-video3.mp4",
-            "https://your-host.com/plan9-video4.mp4",
-            "https://your-host.com/plan9-video5.mp4",
-        ],
-    },
-    {
-        "id": 10,
-        "name": "Plan 10 Demo",
-        "buy_url": "https://example.com/buy10",
-        "image": "https://your-host.com/plan10-image.jpg",
-    },
-]
+# ==========================================
+# 8. USER STATE TRACKING
+# ==========================================
+# Stores list of message IDs sent during a demo session per user: {user_id: [msg_id_1, msg_id_2, ...]}
+user_active_demo_messages = {}
 
 
-# User ID -> active demo messages
-active_demos = {}
+def track_message(user_id, message_or_messages):
+  """Helper to track message IDs sent to a user for cleanup."""
+  if user_id not in user_active_demo_messages:
+    user_active_demo_messages[user_id] = []
+
+  if isinstance(message_or_messages, list):
+    for msg in message_or_messages:
+      user_active_demo_messages[user_id].append(msg.message_id)
+  else:
+    user_active_demo_messages[user_id].append(message_or_messages.message_id)
 
 
-# ==================================================
-# BUTTON HELPER
-# ==================================================
-
-def make_button(text, callback_data=None, url=None, style=None):
-    kwargs = {"text": text}
-
-    if callback_data is not None:
-        kwargs["callback_data"] = callback_data
-
-    if url is not None:
-        kwargs["url"] = url
-
-    if style:
-        try:
-            return InlineKeyboardButton(**kwargs, style=style)
-        except (TypeError, ValueError):
-            pass
-
-    return InlineKeyboardButton(**kwargs)
-
-
-def get_plan(plan_id):
-    return next(
-        (plan for plan in PLANS if plan["id"] == plan_id),
-        None
-    )
-
-
-def is_placeholder(url):
-    return (
-        not isinstance(url, str)
-        or not url.strip()
-        or "your-host.com" in url
-        or "example.com" in url
-    )
-
-
-def valid_url(url):
-    return (
-        isinstance(url, str)
-        and url.startswith(("https://", "http://"))
-        and not is_placeholder(url)
-    )
-
-
-# ==================================================
-# DELETE CURRENT DEMO
-# ==================================================
-
-def delete_demo(user_id):
-    demo = active_demos.pop(user_id, None)
-
-    if not demo:
-        return
-
-    for message_id in reversed(demo["message_ids"]):
-        try:
-            bot.delete_message(
-                demo["chat_id"],
-                message_id
-            )
-        except Exception:
-            log.info("Could not delete message %s", message_id)
-
-
-# ==================================================
-# START / PLAN MENU
-# ==================================================
-
-def send_plan_menu(chat_id):
-    kb = InlineKeyboardMarkup(row_width=2)
-
-    for plan in PLANS:
-        kb.add(
-            make_button(
-                plan["name"],
-                callback_data=f"plan:{plan['id']}",
-                style="danger"
-            )
+def clear_user_demo(chat_id, user_id):
+  """Deletes tracked demo messages safely with error handling."""
+  if user_id in user_active_demo_messages:
+    for msg_id in user_active_demo_messages[user_id]:
+      try:
+        bot.delete_message(chat_id, msg_id)
+      except Exception as e:
+        logger.warning(
+            f"Could not delete message {msg_id} for user {user_id}: {e}"
         )
-
-    bot.send_message(
-        chat_id,
-        "Jis plan ka demo dekhna chahte ho, "
-        "us plan ko select karo 👇",
-        reply_markup=kb
-    )
+    user_active_demo_messages[user_id] = []
 
 
+# ==========================================
+# 2. START MENU HANDLER
+# ==========================================
 @bot.message_handler(commands=["start"])
-def start(message):
-    delete_demo(message.from_user.id)
-    send_plan_menu(message.chat.id)
+def send_start_menu(message):
+  chat_id = message.chat.id
+  user_id = message.from_user.id
 
+  # Clear any lingering old state if applicable
+  clear_user_demo(chat_id, user_id)
 
-# ==================================================
-# DEMO BUTTONS
-# ==================================================
+  # 2. Display one caption with 10 danger-style (red) buttons
+  caption = "Select your plan to see the demo."
 
-def demo_keyboard(plan_id):
-    kb = InlineKeyboardMarkup(row_width=2)
-
-    kb.row(
-        make_button(
-            "🛒 Buy Now",
-            callback_data=f"buy:{plan_id}",
-            style="success"
-        ),
-        make_button(
-            "🔄 Change Plan",
-            callback_data="change_plan",
-            style="primary"
-        )
+  markup = types.InlineKeyboardMarkup(row_id=2)
+  for i in range(1, 11):
+    # Telegram inline buttons don't have native color styling via Bot API,
+    # but Danger style is conventionally represented or handled via UI clients if supported,
+    # or we map callback data properly.
+    button_text = f"Plan {i} Demo"
+    callback_data = f"select_plan_{i}"
+    markup.add(
+        types.InlineKeyboardButton(text=button_text, callback_data=callback_data)
     )
 
-    return kb
+  bot.send_message(chat_id, caption, reply_markup=markup)
 
 
-# ==================================================
-# PLAN DEMO
-# ==================================================
+# ==========================================
+# 3, 4, 9. PLAN SELECTION & MEDIA HANDLERS
+# ==========================================
+@bot.callback_query_handler(func=lambda call: call.data.startswith("select_plan_"))
+def handle_plan_selection(call):
+  chat_id = call.message.chat.id
+  user_id = call.from_user.id
+  plan_num = call.data.split("_")[-1]
+  plan_key = f"plan_{plan_num}"
 
-@bot.callback_query_handler(
-    func=lambda call: call.data.startswith("plan:")
-)
-def show_demo(call):
-    bot.answer_callback_query(call.id)
+  # Acknowledge callback query to stop loading animation
+  bot.answer_callback_query(call.id)
 
+  # Clear existing message to refresh view
+  try:
+    bot.delete_message(chat_id, call.message.message_id)
+  except Exception as e:
+    logger.warning(f"Could main start menu message be deleted: {e}")
+
+  # Reset user state tracking list
+  user_active_demo_messages[user_id] = []
+
+  # Action for Plan 10 (Image only)
+  if plan_num == "10":
+    if "placeholder" in PLAN_10_IMAGE:
+      logger.warning("Plan 10 image URL is still set to a placeholder.")
+    
     try:
-        plan_id = int(call.data.split(":")[1])
-    except (ValueError, IndexError):
-        return
+      markup = types.InlineKeyboardMarkup()
+      markup.add(
+          types.InlineKeyboardButton(
+              "Buy Now", callback_data=f"buy_{plan_key}"
+          ),
+          types.InlineKeyboardButton(
+              "Change Plan", callback_data="change_plan"
+          ),
+      )
 
-    plan = get_plan(plan_id)
-
-    if not plan:
-        return
-
-    user_id = call.from_user.id
-    chat_id = call.message.chat.id
-
-    delete_demo(user_id)
-
-    message_ids = []
-
-    # --------------------------------------------------
-    # PLAN 10: IMAGE ONLY
-    # --------------------------------------------------
-
-    if plan_id == 10:
-        image_url = plan.get("image", "")
-
-        if not valid_url(image_url):
-            bot.send_message(
-                chat_id,
-                "Plan 10 ki image URL abhi set nahi hai."
-            )
-            return
-
-        try:
-            sent = bot.send_photo(
-                chat_id,
-                photo=image_url,
-                caption=(
-                    "🖼️ Plan 10 Demo\n\n"
-                    "Image dekh lo. Neeche apna option select karo."
-                ),
-                reply_markup=demo_keyboard(plan_id)
-            )
-
-            message_ids.append(sent.message_id)
-
-        except Exception:
-            log.exception("Plan 10 image send failed")
-            bot.send_message(
-                chat_id,
-                "Image send nahi hui. Direct image URL check karo."
-            )
-            return
-
-    # --------------------------------------------------
-    # PLANS 1-9: VIDEO MEDIA GROUP
-    # --------------------------------------------------
-
-    else:
-        videos = [
-            url for url in plan.get("videos", [])
-            if valid_url(url)
-        ][:10]
-
-        if not videos:
-            bot.send_message(
-                chat_id,
-                f"{plan['name']} ke video URLs abhi set nahi hain."
-            )
-            return
-
-        media = [
-            InputMediaVideo(
-                media=url,
-                has_spoiler=True
-            )
-            for url in videos
-        ]
-
-        try:
-            sent_messages = bot.send_media_group(
-                chat_id,
-                media
-            )
-
-            message_ids.extend(
-                msg.message_id for msg in sent_messages
-            )
-
-            instruction = bot.send_message(
-                chat_id,
-                "🎬 Video dekhne ke liye video par tap karo.\n\n"
-                "Demo pasand aaye toh Buy Now dabao, "
-                "ya doosra plan dekhne ke liye Change Plan dabao.",
-                reply_markup=demo_keyboard(plan_id)
-            )
-
-            message_ids.append(instruction.message_id)
-
-except Exception as e:
-    log.exception("Video media group failed: %s", e)
-
-    for message_id in reversed(message_ids):
-        try:
-            bot.delete_message(chat_id, message_id)
-        except Exception:
-            pass
-
-    bot.send_message(
-        chat_id,
-        f"Video error: {str(e)[:800]}"
-    )
+      sent_msg = bot.send_photo(
+          chat_id=chat_id,
+          photo=PLAN_10_IMAGE,
+          caption="Plan 10 Demo Image\n\nTap the buttons below:",
+          reply_markup=markup,
+      )
+      track_message(user_id, sent_msg)
+    except Exception as e:
+      logger.error(f"Failed to send image for Plan 10: {e}")
+      bot.send_message(
+          chat_id,
+          f"<b>Error:</b> Plan 10 image load nahi ho payi.\n<pre>{e}</pre>",
+      )
     return
 
-    active_demos[user_id] = {
-        "chat_id": chat_id,
-        "message_ids": message_ids
-    }
+  # Actions for Plans 1 to 9 (Videos with spoilers)
+  urls = PLAN_VIDEOS.get(plan_key, [])
+  
+  # Validate URLs
+  for url in urls:
+    if "placeholder" in url:
+      logger.warning(f"URL placeholder found unreplaced in {plan_key}: {url}")
 
-
-# ==================================================
-# BUY NOW
-# ==================================================
-
-@bot.callback_query_handler(
-    func=lambda call: call.data.startswith("buy:")
-)
-def buy_now(call):
-    try:
-        plan_id = int(call.data.split(":")[1])
-    except (ValueError, IndexError):
-        bot.answer_callback_query(call.id, "Invalid plan")
-        return
-
-    plan = get_plan(plan_id)
-
-    if not plan:
-        bot.answer_callback_query(
-            call.id,
-            "Plan nahi mila.",
-            show_alert=True
-        )
-        return
-
-    bot.answer_callback_query(call.id)
-
-    user_id = call.from_user.id
-    chat_id = call.message.chat.id
-
-    # Demo aur uske buttons delete karo.
-    delete_demo(user_id)
-
-    buy_url = plan.get("buy_url", "")
-
-    if not valid_url(buy_url):
-        bot.send_message(
-            chat_id,
-            "Is plan ka purchase URL abhi set nahi hai."
-        )
-        return
-
-    kb = InlineKeyboardMarkup()
-
-    kb.add(
-        make_button(
-            "💳 Continue to Buy",
-            url=buy_url,
-            style="success"
+  media_group = []
+  for idx, url in enumerate(urls):
+    # Apply Telegram's spoiler feature to every video using caption or input media parameter
+    is_first = (idx == 0)
+    media_group.append(
+        types.InputMediaVideo(
+            media=url,
+            has_spoiler=True,
+            caption="Demo Video" if is_first else None,
         )
     )
 
+  try:
+    # Send media group
+    sent_media = bot.send_media_group(chat_id=chat_id, media=media_group)
+    track_message(user_id, sent_media)
+
+    # Instruction message and buttons below the media group
+    instruction_text = "Tap the video to watch the demo."
+    markup = types.InlineKeyboardMarkup()
+    markup.add(
+        types.InlineKeyboardButton("Buy Now", callback_data=f"buy_{plan_key}"),
+        types.InlineKeyboardButton("Change Plan", callback_data="change_plan"),
+    )
+
+    sent_instruction = bot.send_message(
+        chat_id=chat_id, text=instruction_text, reply_markup=markup
+    )
+    track_message(user_id, sent_instruction)
+
+  except Exception as e:
+    logger.error(f"Telegram API Error while sending videos for {plan_key}: {e}")
     bot.send_message(
         chat_id,
-        f"{plan['name']} select kiya hai.\n"
-        "Purchase karne ke liye neeche click karo.",
-        reply_markup=kb
+        f"<b>Telegram API Error:</b> Videos send karne mein samasya aayi.\n<pre>{e}</pre>",
+    )
+    # Fallback to main menu if it fails
+    send_start_menu(call.message)
+
+
+# ==========================================
+# 6 & 7. BUY NOW & CHANGE PLAN HANDLERS
+# ==========================================
+@bot.callback_query_handler(func=lambda call: call.data.startswith("buy_"))
+def handle_buy_now(call):
+  chat_id = call.message.chat.id
+  user_id = call.from_user.id
+  plan_key = call.data.replace("buy_", "")
+  purchase_url = PLAN_PURCHASE_URLS.get(plan_key, "https://t.me/")
+
+  bot.answer_callback_query(call.id)
+
+  # 8. Delete currently displayed demo media and its instruction/button messages
+  clear_user_demo(chat_id, user_id)
+
+  # Display purchase message with URL button
+  markup = types.InlineKeyboardMarkup()
+  markup.add(types.InlineKeyboardButton("Proceed to Payment", url=purchase_url))
+  markup.add(
+      types.InlineKeyboardButton("Back to Menu", callback_data="change_plan")
+  )
+
+  bot.send_message(
+      chat_id,
+      "Aapke dwara chune gaye plan ko kharidne ke liye niche diye gaye button par click karein:",
+      reply_markup=markup,
+  )
+
+
+@bot.callback_query_handler(func=lambda call: call.data == "change_plan")
+def handle_change_plan(call):
+  chat_id = call.message.chat.id
+  user_id = call.from_user.id
+
+  bot.answer_callback_query(call.id)
+
+  # 8. Delete currently displayed demo media and its instruction/button messages
+  clear_user_demo(chat_id, user_id)
+  
+  # Also remove the current trigger message if it exists
+  try:
+    bot.delete_message(chat_id, call.message.message_id)
+  except Exception:
+    pass
+
+  # Show original menu containing all 10 plan buttons
+  caption = "Select your plan to see the demo."
+  markup = types.InlineKeyboardMarkup(row_width=2)
+  for i in range(1, 11):
+    markup.add(
+        types.InlineKeyboardButton(
+            text=f"Plan {i} Demo", callback_data=f"select_plan_{i}"
+        )
     )
 
-
-# ==================================================
-# CHANGE PLAN
-# ==================================================
-
-@bot.callback_query_handler(
-    func=lambda call: call.data == "change_plan"
-)
-def change_plan(call):
-    bot.answer_callback_query(call.id)
-
-    user_id = call.from_user.id
-    chat_id = call.message.chat.id
-
-    # Purana demo delete karo.
-    delete_demo(user_id)
-
-    send_plan_menu(chat_id)
+  bot.send_message(chat_id, caption, reply_markup=markup)
 
 
-# ==================================================
-# START BOT
-# ==================================================
-
+# ==========================================
+# MAIN ENTRY POINT
+# ==========================================
 if __name__ == "__main__":
-    log.info("Demo bot starting")
-
-    bot.infinity_polling(
-        skip_pending=True,
-        timeout=30,
-        long_polling_timeout=30
-    )
+  logger.info("Bot is starting up...")
+  bot.infinity_polling(skip_pending=True)
