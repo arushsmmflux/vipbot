@@ -19,13 +19,11 @@ logger = logging.getLogger(__name__)
 # ==========================================
 # 5 & 6. CONTENT & PURCHASE URL CONFIGURATION
 # ==========================================
-# Leave or replace these placeholders with your actual direct public video URLs.
-# Each plan from Plan 1 to Plan 9 has its own list of video URLs.
 PLAN_VIDEOS = {
-    "𝙈𝙊𝙈 𝘼𝙉𝘿 𝙎𝙊𝙉 😍🔥": [
-        "https://videotourl.com/videos/1791609652325-1646ca32-e73f-4a5a-9874-a0f4e401c6bb.mp4",
-        "https://videotourl.com/videos/1791610410648-c50ab2d2-b1b2-4998-8f5f-43a5f719b603.mp4",
-        "https://videotourl.com/videos/1791609530271-d1845e11-78bd-4465-a0e3-3e0dd57fb424.mp4",
+    "plan_1": [
+        "https://videotourl.com/videos/placeholder_1_1.mp4",
+        "https://videotourl.com/videos/placeholder_1_2.mp4",
+        "https://videotourl.com/videos/placeholder_1_3.mp4",
         "https://videotourl.com/videos/placeholder_1_4.mp4",
         "https://videotourl.com/videos/placeholder_1_5.mp4",
     ],
@@ -87,10 +85,8 @@ PLAN_VIDEOS = {
     ],
 }
 
-# 4. Plan 10 Image URL Placeholder
 PLAN_10_IMAGE = "https://videotourl.com/images/placeholder_plan_10.jpg"
 
-# 6. Configurable Purchase URLs for each plan
 PLAN_PURCHASE_URLS = {
     "plan_1": "https://yourpaymentgateway.com/pay/plan1",
     "plan_2": "https://yourpaymentgateway.com/pay/plan2",
@@ -107,12 +103,10 @@ PLAN_PURCHASE_URLS = {
 # ==========================================
 # 8. USER STATE TRACKING
 # ==========================================
-# Stores list of message IDs sent during a demo session per user: {user_id: [msg_id_1, msg_id_2, ...]}
 user_active_demo_messages = {}
 
 
 def track_message(user_id, message_or_messages):
-  """Helper to track message IDs sent to a user for cleanup."""
   if user_id not in user_active_demo_messages:
     user_active_demo_messages[user_id] = []
 
@@ -124,15 +118,12 @@ def track_message(user_id, message_or_messages):
 
 
 def clear_user_demo(chat_id, user_id):
-  """Deletes tracked demo messages safely with error handling."""
   if user_id in user_active_demo_messages:
     for msg_id in user_active_demo_messages[user_id]:
       try:
         bot.delete_message(chat_id, msg_id)
       except Exception as e:
-        logger.warning(
-            f"Could not delete message {msg_id} for user {user_id}: {e}"
-        )
+        logger.warning(f"Could not delete message {msg_id}: {e}")
     user_active_demo_messages[user_id] = []
 
 
@@ -144,17 +135,13 @@ def send_start_menu(message):
   chat_id = message.chat.id
   user_id = message.from_user.id
 
-  # Clear any lingering old state if applicable
   clear_user_demo(chat_id, user_id)
 
-  # 2. Display one caption with 10 danger-style (red) buttons
   caption = "Select your plan to see the demo."
 
-  markup = types.InlineKeyboardMarkup(row_id=2)
+  # Fixed row_width here instead of row_id
+  markup = types.InlineKeyboardMarkup(row_width=2)
   for i in range(1, 11):
-    # Telegram inline buttons don't have native color styling via Bot API,
-    # but Danger style is conventionally represented or handled via UI clients if supported,
-    # or we map callback data properly.
     button_text = f"Plan {i} Demo"
     callback_data = f"select_plan_{i}"
     markup.add(
@@ -174,23 +161,16 @@ def handle_plan_selection(call):
   plan_num = call.data.split("_")[-1]
   plan_key = f"plan_{plan_num}"
 
-  # Acknowledge callback query to stop loading animation
   bot.answer_callback_query(call.id)
 
-  # Clear existing message to refresh view
   try:
     bot.delete_message(chat_id, call.message.message_id)
   except Exception as e:
-    logger.warning(f"Could main start menu message be deleted: {e}")
+    logger.warning(f"Could not delete menu message: {e}")
 
-  # Reset user state tracking list
   user_active_demo_messages[user_id] = []
 
-  # Action for Plan 10 (Image only)
   if plan_num == "10":
-    if "placeholder" in PLAN_10_IMAGE:
-      logger.warning("Plan 10 image URL is still set to a placeholder.")
-    
     try:
       markup = types.InlineKeyboardMarkup()
       markup.add(
@@ -211,23 +191,12 @@ def handle_plan_selection(call):
       track_message(user_id, sent_msg)
     except Exception as e:
       logger.error(f"Failed to send image for Plan 10: {e}")
-      bot.send_message(
-          chat_id,
-          f"<b>Error:</b> Plan 10 image load nahi ho payi.\n<pre>{e}</pre>",
-      )
+      bot.send_message(chat_id, f"<b>Error:</b> {e}")
     return
 
-  # Actions for Plans 1 to 9 (Videos with spoilers)
   urls = PLAN_VIDEOS.get(plan_key, [])
-  
-  # Validate URLs
-  for url in urls:
-    if "placeholder" in url:
-      logger.warning(f"URL placeholder found unreplaced in {plan_key}: {url}")
-
   media_group = []
   for idx, url in enumerate(urls):
-    # Apply Telegram's spoiler feature to every video using caption or input media parameter
     is_first = (idx == 0)
     media_group.append(
         types.InputMediaVideo(
@@ -238,11 +207,9 @@ def handle_plan_selection(call):
     )
 
   try:
-    # Send media group
     sent_media = bot.send_media_group(chat_id=chat_id, media=media_group)
     track_message(user_id, sent_media)
 
-    # Instruction message and buttons below the media group
     instruction_text = "Tap the video to watch the demo."
     markup = types.InlineKeyboardMarkup()
     markup.add(
@@ -256,12 +223,8 @@ def handle_plan_selection(call):
     track_message(user_id, sent_instruction)
 
   except Exception as e:
-    logger.error(f"Telegram API Error while sending videos for {plan_key}: {e}")
-    bot.send_message(
-        chat_id,
-        f"<b>Telegram API Error:</b> Videos send karne mein samasya aayi.\n<pre>{e}</pre>",
-    )
-    # Fallback to main menu if it fails
+    logger.error(f"Telegram API Error for {plan_key}: {e}")
+    bot.send_message(chat_id, f"<b>Telegram API Error:</b>\n<pre>{e}</pre>")
     send_start_menu(call.message)
 
 
@@ -276,11 +239,8 @@ def handle_buy_now(call):
   purchase_url = PLAN_PURCHASE_URLS.get(plan_key, "https://t.me/")
 
   bot.answer_callback_query(call.id)
-
-  # 8. Delete currently displayed demo media and its instruction/button messages
   clear_user_demo(chat_id, user_id)
 
-  # Display purchase message with URL button
   markup = types.InlineKeyboardMarkup()
   markup.add(types.InlineKeyboardButton("Proceed to Payment", url=purchase_url))
   markup.add(
@@ -300,17 +260,13 @@ def handle_change_plan(call):
   user_id = call.from_user.id
 
   bot.answer_callback_query(call.id)
-
-  # 8. Delete currently displayed demo media and its instruction/button messages
   clear_user_demo(chat_id, user_id)
   
-  # Also remove the current trigger message if it exists
   try:
     bot.delete_message(chat_id, call.message.message_id)
   except Exception:
     pass
 
-  # Show original menu containing all 10 plan buttons
   caption = "Select your plan to see the demo."
   markup = types.InlineKeyboardMarkup(row_width=2)
   for i in range(1, 11):
@@ -327,6 +283,6 @@ def handle_change_plan(call):
 # MAIN ENTRY POINT
 # ==========================================
 if __name__ == "__main__":
-    logger.info("Bot is starting up...")
-    bot.remove_webhook()  # Telegram ke purane webhook ko remove karne ke liye
-    bot.infinity_polling(skip_pending=True)
+  logger.info("Bot is starting up...")
+  bot.remove_webhook()
+  bot.infinity_polling(skip_pending=True)
